@@ -3,12 +3,14 @@ clear all;
 close all;
 clc;
 
+tic;
+
 %% Parámetros generales
 n = 2; % Número de variables
 np = 640; % Pobladores
 tp = [0.001 0.001];  % Tamaño de paso por variable (puedes personalizar)
-xmin = 0 * ones(1,n);
-xmax =  1 * ones(1,n);
+xmin = -5.12 * ones(1,n);
+xmax =  5.12 * ones(1,n);
 
 %% Discretización
 elementos = ceil(((xmax - xmin)./tp) + 1);
@@ -84,3 +86,5 @@ figure; plot(yprom,'LineWidth',1.3);
 xlabel('Generación'); ylabel('Fitness promedio (y)');
 title('Convergencia del GA');
 grid on;
+
+toc;
