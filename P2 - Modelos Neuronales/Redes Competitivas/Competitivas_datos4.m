@@ -2,13 +2,17 @@ clear all; close all; clc;
 
 %% Carga de datos
 
-load datos1.mat
+load datos4.mat
 
-data = datos1;  % Renombrar las variables
+for k=1:35
+    eval(sprintf('data(:,%d)=BMV_%dfinal(:,5)',k,k));
+end
+
+data = normalize(data);
 
 %% Crear modelo neuronal
 
-nn = 5;  % Número de neuronas
+nn = 4;  % Número de neuronas
 
 red = competlayer(nn); % Definir tipo de modelo
 
@@ -20,9 +24,6 @@ red = train(red, data);  % Entrenamiento
 
 Wf = red.IW{1,1}';
 
-plot(data(1,:), data(2,:),'b.', ...
-    Wf(1,:), Wf(2,:), 'gp')
-
 Y = red(data);  % Y estimada
 Y = vec2ind(Y);  % Convierte de vectores a índices
 grupos = unique(Y);  % Devuelve valores únicos, quita repeticiones
@@ -30,8 +31,11 @@ grupos = unique(Y);  % Devuelve valores únicos, quita repeticiones
 %% Asignar los datos a cada grupo
 
 for k = 1:size(grupos,2)
-    temp = data(Y == grupos(1,k));
+    temp = data(:,Y == grupos(1,k));
 
     eval(sprintf('grupo%d=temp;', grupos(1,k)))
+
+    figure(k)
+    eval(sprintf('plot(grupo%d);', grupos(1,k)))
 
 end

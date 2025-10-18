@@ -2,13 +2,13 @@ clear all; close all; clc;
 
 %% Carga de datos
 
-load datos1.mat
+load datos2.mat
 
-data = datos1;  % Renombrar las variables
+data = datos2;  % Renombrar las variables
 
 %% Crear modelo neuronal
 
-nn = 5;  % Número de neuronas
+nn = 6;  % Número de neuronas
 
 red = competlayer(nn); % Definir tipo de modelo
 
@@ -20,7 +20,7 @@ red = train(red, data);  % Entrenamiento
 
 Wf = red.IW{1,1}';
 
-plot(data(1,:), data(2,:),'b.', ...
+plot3(data(1,:), data(2,:), data(3,:),'b.', ...
     Wf(1,:), Wf(2,:), 'gp')
 
 Y = red(data);  % Y estimada
