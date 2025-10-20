@@ -4,11 +4,11 @@ clear all; close all; clc;
 
 load datos2.mat
 
-data = datos;  % Renombrar las variables
+data = datos2;  % Renombrar las variables
 
 %% Crear modelo neuronal
 
-nn = 6;  % Número de neuronas
+nn = 4;  % Número de neuronas
 
 red = competlayer(nn); % Definir tipo de modelo
 
