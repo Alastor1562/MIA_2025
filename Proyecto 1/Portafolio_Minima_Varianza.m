@@ -2,6 +2,8 @@ clear all; close all; clc;
 
 rng(123456789)
 
+tic
+
 %% Datos: precios -> rendimientos -> covarianza
 load data_proyecto.mat 
 
@@ -107,3 +109,5 @@ figure; plot(yprom,'LineWidth',1.3);
 xlabel('Generación'); ylabel('Fitness promedio');
 title('Convergencia del GA (min varianza con penalización)');
 grid on;
+
+toc

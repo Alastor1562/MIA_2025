@@ -1,5 +1,7 @@
 clear all; close all; clc;
 
+rng(1234)
+
 %% Carga de datos
 load KnowledgeModeling.mat
 
@@ -8,7 +10,7 @@ classify = table2array(Classify)';
 
 %% Experimento: #neuronas vs costo
 
-lista_nn = 2:6;
+lista_nn = 2:5;
 costos  = zeros(size(lista_nn));
 
 for i = 1:numel(lista_nn)
@@ -39,10 +41,6 @@ ylabel('Costo competitivo promedio');
 title('Costo vs número de neuronas'); 
 grid on;
 
-% Mejor # de neuronas (mínimo costo)
-[val, idx] = min(costos);
-mejor_nn = lista_nn(idx);
-fprintf('\nMejor configuración: nn=%d con costo=%.6f\n', mejor_nn, val);
 
 %% Modelo adecuado
 
@@ -63,9 +61,15 @@ grupos = unique(Y);  % Devuelve valores únicos, quita repeticiones
 for k = 1:size(grupos,2)
     temp = data(:,Y == grupos(1,k));
     eval(sprintf('grupo%d_train=temp;', grupos(1,k)))
+
+    % Cantidad de datos por grupo
+
+    eval(sprintf('n_datos=size(grupo%d_train,2);', grupos(1,k)))
+
+    fprintf('grupo %d  ->  %d datos\n', grupos(1,k), n_datos);
 end
 
 %% Clasificar nuevos datos
-Y_classify = vec2ind(red(classify));  % Índice de neurona ganadora para cada muestra nueva
+Y_classify = vec2ind(red(classify'));  % Índice de neurona ganadora para cada muestra nueva
 
 Predicciones = [classify; Y_classify]'

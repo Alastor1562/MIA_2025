@@ -4,37 +4,49 @@ load CCPP.mat
 
 data = table2array(CCPP);
 
-X = normalize(data(:, 1:4));
-Y = data(:, 5);
+%% Train-Test
+
+index = round(size(data,1) * 0.8);
+
+X_train = normalize(data(1:index, 1:4));
+Y_train = data(1:index, 5);
+
+X_test = normalize(data(index+1:end, 1:4));
+Y_test = data(index+1:end, 5);
 
 %% Mínimos cuadrados
-n = size(data,1); % Cantidad de datos
+n_train = size(X_train,1); % Cantidad de datos de entrenamiento
 
 %% Construir X*, captura la forma del modelo
-grado = 10;
+grado = 4;
 for k=1:grado
-    Xa = func_polinomio2(X, k);
+    Xa = func_polinomio2(X_train, k);
 
-    Wmc = inv(Xa' * Xa) * Xa' * Y;
+    Wmc = inv(Xa' * Xa) * Xa' * Y_train;
     
     Yg = Xa * Wmc; % Y estimada
     
-    E = Y - Yg; % Error
+    E = Y_train - Yg; % Error
     
-    J(k,1) = (E' * E) / (2*n); % Costo
+    Jtrain(k,1) = (E' * E) / (2*n_train); % Costo
 
 end
 
-plot(J,'b')
+plot(Jtrain,'b')
 
 %% Modelo Óptimo
 
-[Xa, coef] = func_polinomio2(X, 2);
+g_opt = 2;
 
-Wmc = inv(Xa' * Xa) * Xa' * Y;  % pesos por mínimos cuadrados
-Yg = Xa * Wmc; % Y estimada
-E = Y - Yg; % Error 
-J = (E' * E) / (2*n) % Costo
+n_test = size(X_test,1);
+
+[Xa, coef] = func_polinomio2(X_train, g_opt);
+Wmc = inv(Xa' * Xa) * Xa' * Y_train;  % pesos por mínimos cuadrados
+
+Xa_test = func_polinomio2(X_test, g_opt);
+Yg = Xa_test * Wmc; % Y estimada
+E = Y_test - Yg; % Error 
+J = (E' * E) / (2*n_test) % Costo
 
 % Mostrar ecuación
 decod_func_polinomio2(Xa, coef, Wmc)

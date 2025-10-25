@@ -1,0 +1,70 @@
+clear all; close all; clc;
+
+%% Carga de datos
+load Datainmuno.mat
+
+data = table2array(Datainmuno);
+
+%% Regresión Logística
+
+X = data(1:90, 1:7);  % Variables de entrada
+
+Y = data(1:90, 8);  % salidas de 1s y 0s
+
+%% Escalamiento
+
+X = normalize(X);
+
+%% Modelado
+
+n = size(X,1);  % Cantidad de datos
+
+grado = 2;
+
+[Xa coef] = func_polinomio2(X,grado);  % La forma del modelo
+
+% Inicialización de parámetros
+W = zeros(size(Xa, 2), 1);  % Pesos iniciales
+
+[J, dJdW] = func_costo(W, Xa, Y);
+
+options = optimset('GradObj', 'on', 'MaxIter', 1000);
+
+[Wopt, Jopt] = fminunc(@(W)func_costo(W, Xa, Y), W, options);
+
+%% Simulación con valores óptimos
+
+V = Xa * Wopt;
+
+Yg = round(1./(1+exp(-V)));
+
+% Matriz de Confusión
+
+TP = sum((Y==1) & (Yg==1));  % Verdaderos positivos
+TN = sum((Y==0) & (Yg==0));  % Verdaderos negativos
+FP = sum((Y==0) & (Yg==1));  % Falsos positivos
+FN = sum((Y==1) & (Yg==0));  % Falsos negativos
+
+%%  Medidas de desempeño
+
+exa = (TP+TN) / (TP+TN+FP+FN);  % Exactitud
+
+pre = TP / (TP+FP);  % Precisión
+
+rec = TP / (TP+FN);  % Recall
+
+[exa, pre, rec]
+
+decod_func_polinomio2(Xa, coef, Wopt)
+
+bar(Wopt)
+
+%% Predicciones nuevas
+
+Xpred = normalize(data(91:93, 1:7));
+
+Xapred = func_polinomio2(Xpred,grado);
+Vpred = Xapred*Wopt;
+Ygpred = round(1./(1+exp(-Vpred)));
+
+Predicciones = [Xpred Ygpred]
