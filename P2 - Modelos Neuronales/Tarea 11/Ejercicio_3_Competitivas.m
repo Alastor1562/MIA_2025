@@ -29,7 +29,7 @@ for i = 1:numel(lista_nn)
     W_asignado = Wf(:, Y);
 
     % Costo (promedio de normas columna a columna)
-    costos(i) = func_costo_competitivas(data, W_asignado);
+    costos(i) = funcs.func_costo_competitivas(data, W_asignado);
     fprintf('nn=%d  ->  costo=%.6f\n', nn, costos(i));
 end
 
