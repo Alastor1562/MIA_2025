@@ -10,6 +10,8 @@ data = table2array(data);
 X = data(:,1:6);
 Y = data(:,7);
 
+X = [X, X.^2, sqrt(abs(X))];
+
 cv = cvpartition(Y, 'HoldOut', 0.15);
 
 % Datos de entrenamiento.
