@@ -1,0 +1,77 @@
+clear all; close all; clc;
+
+%% Load Data
+
+load datos4.mat
+
+Y = IPCfinal(:,5);  % Salida
+U = BMV_11final(:,5);  % Entrada
+
+% Transformación de matrices a celdas
+
+for k = 1:size(Y,1)
+    Yc{k,:} = Y(k,:);
+    Uc{k,:} = U(k,:);
+end
+% Yc = num2cell(Y)
+
+Yc = Yc';
+Uc = Uc';
+
+%% Partición
+idx = round(size(Y,1) * 0.9);
+
+Ytrain = Yc(:,1:idx);
+Ytest = Yc(:,idx+1:end);
+
+Utrain = Uc(:,1:idx);
+Utest = Uc(:,idx+1:end);
+
+%% Creación del modelo neuronal
+nrez = 5;
+noc = [10 10 10];  % Número de neuronas ocultas
+
+% Definir la arquitectura de la red neuronal
+red = narxnet(1:nrez, 1:nrez, noc);
+            % 1er param: Número de rezafos a la entrada U
+            % 2do param: Número de rezafos a la salida Y
+            % 3er param: Estructura de la red
+
+[Us, Ui, Yi, Ys] = preparets(red, Utrain, {}, Ytrain);
+% Se preparan matrices para reconstruir la serie de tiempo
+
+red = train(red, Us, Ys, Ui, Yi);
+
+%% Simulación
+Ygtrain = red(Us, Ui, Yi);
+
+figure(1)
+plotresponse(Ys, Ygtrain)
+
+%% Simulación de Test
+[Us, Ui, Yi, Ys] = preparets(red, Utest, {}, Ytest);
+
+Ygtest = red(Us, Ui, Yi);
+
+figure(2)
+plotresponse(Ys, Ygtest)
+
+%% Simulación cerrando el lazo
+redLc = closeloop(red);
+
+[Us, Ui, Yi, Ys] = preparets(redLc, Utest, {}, Ytest);
+
+YgtestLc = redLc(Us, Ui, Yi);
+
+figure(3)
+plotresponse(Ys, YgtestLc)
+
+%% Remover los rezagos
+redLcsr = removedelay(redLc);
+
+[Us, Ui, Yi, Ys] = preparets(redLcsr, Utest, {}, Ytest);
+
+YgtestLcsr = redLcsr(Us, Ui, Yi);
+
+figure(4)
+plotresponse(Ys, YgtestLcsr)

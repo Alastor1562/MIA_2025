@@ -1,0 +1,52 @@
+clear all; close all; clc;
+
+%% Load Data
+load ex_mia4_data1.mat
+
+% Renombra el dataset para no chocar con la función train
+trainData = train;           % copia
+clear train                   % quita el nombre conflictivo del workspace
+
+Xtrain = trainData(:,1:3);
+Xtest = test_unknown;
+
+Ytrain = trainData(:,4);
+
+%% Modelo de una salida
+red1 = feedforwardnet([10 10 10]);
+red1.trainFcn = 'trainrp';
+red1 = train(red1, Xtrain', Ytrain');
+
+% Simulación
+Ygtest1 = round(red1(Xtest'))';
+Ygtest1(Ygtest1 > 3,:) = 3;
+Ygtest1(Ygtest1 < 1,:) = 1;
+
+%% Modelo de 3 salidas
+% Determinar número de clases
+labels = unique(Ytrain);
+n = numel(labels);
+
+% Crear matriz dummy
+Ytraind = zeros(length(Ytrain), n);
+for i = 1:n
+    Ytraind(Ytrain == labels(i), i) = 1;
+end
+
+% Definir y entrenar la red neuronal
+red2 = feedforwardnet([10 10 10]);
+red2.trainFcn = 'trainrp';  % trainrp / trainscg
+red2 = train(red2, Xtrain', Ytraind');
+
+% Simulación
+Ygtestd = red2(Xtest');  
+
+[~, idx] = max(Ygtestd', [], 2);
+Ygtest2 = labels(idx);
+
+%% Comparación de ambos métodos
+Yg = Ygtest1 == Ygtest2;
+similitud = sum(Yg) / size(Yg,1)
+
+
+

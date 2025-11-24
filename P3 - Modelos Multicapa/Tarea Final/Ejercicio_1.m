@@ -1,0 +1,43 @@
+clear all; close all; clc;
+
+%% Load Data
+load house.mat
+
+data = house';
+
+X = data(:,1:13);
+Y = data(:,14);
+
+%% Partition
+idx = round(size(data,1) * 0.9);
+
+Xtrain = X(1:idx,:);
+Xtest = X(idx+1:end,:);
+
+Ytrain = Y(1:idx, :);
+Ytest = Y(idx+1:end,:);
+
+%% Modelo
+% red = feedforwardnet([10 10 10 10 10]); %% Tipo de red
+% Configuración
+% red.trainFcn = 'trainlm'; % Entrenar por Levenberg-Marquart
+
+% red = train(red, Xtrain', Ytrain
+
+load red_1.mat
+
+%% Simulación
+% Entrenamiento
+Ygtrain = red(Xtrain');
+
+J_train = perform(red,Ytrain,Ygtrain')
+
+% Test
+Ygtest = red(Xtest');
+
+J_test = perform(red,Ytest,Ygtest')
+
+%% Predicciones nuevas
+newData = [12.54, 45, 15.37, 1, 0.5150, 6.1621, 45.800, 3.3751, 7, 193, 15.200, 347.88, 2.96];
+
+YgnewData = red(newData')
